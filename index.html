@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренувальні польоти</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; padding: 15px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+        .btn-copy { width: 100%; padding: 15px; margin-top: 10px; background-color: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .preview-box { background: #f9f9f9; padding: 15px; margin-top: 15px; border: 1px dashed #aaa; white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Тренувальні польоти</h2>
+    <div class="form-group"><label>Дата:</label><input type="date" id="date"></div>
+    <div class="form-group"><label>Тип БПЛА:</label><input type="text" id="uav_type"></div>
+    <div class="form-group"><label>Локація:</label><input type="text" id="location"></div>
+    <div class="form-group"><label>Заявник:</label><input type="text" id="applicant"></div>
+    <div class="row">
+        <div class="form-group"><label>Час (з):</label><input type="time" id="time_start"></div>
+        <div class="form-group"><label>Час (по):</label><input type="time" id="time_end"></div>
+    </div>
+    <div class="form-group"><label>Радіус роботи:</label><input type="text" id="radius"></div>
+    <div class="form-group"><label>Висота роботи:</label><input type="text" id="altitude"></div>
+    <div class="form-group"><label>Мета:</label><input type="text" id="goal"></div>
+    <div class="form-group"><label>Дозвіл:</label><input type="text" id="permission"></div>
+    <div class="form-group"><label>Контактна інформація:</label><input type="text" id="contact"></div>
+
+    <button class="btn-copy" onclick="generateAndCopy()">Сформувати та скопіювати</button>
+    <div class="preview-box" id="preview">Тут з'явиться результат...</div>
+</div>
+
+<script>
+    const fieldIds = ['date', 'uav_type', 'location', 'applicant', 'time_start', 'time_end', 'radius', 'altitude', 'goal', 'permission', 'contact'];
+
+    // Відновлення даних
+    fieldIds.forEach(id => {
+        const val = localStorage.getItem('train_' + id);
+        if (val) document.getElementById(id).value = val;
+    });
+
+    function generateAndCopy() {
+        const val = (id) => document.getElementById(id).value.trim();
+        const d = val('date').split('-');
+        const dateFmt = d.length === 3 ? `${d[2]}.${d[1]}.${d[0]}` : val('date');
+
+        const report = `Заявка на тренувальні польоти на ${dateFmt}:
+1. Тип БПЛА: ${val('uav_type')}
+2. Локація: ${val('location')}
+3. Заявник: ${val('applicant')}
+4. Дата: ${dateFmt}
+5. Час роботи: ${val('time_start')} - ${val('time_end')}
+6. Радіус роботи: ${val('radius')}
+7. Висота роботи: ${val('altitude')}
+8. Мета: ${val('goal')}
+9. Дозвіл: ${val('permission')}
+10. Контактна інформація: ${val('contact')}`;
+
+        document.getElementById('preview').innerText = report;
+        fieldIds.forEach(id => localStorage.setItem('train_' + id, document.getElementById(id).value));
+        
+        navigator.clipboard.writeText(report).then(() => alert("Скопійовано у буфер обміну!"));
+    }
+</script>
+</body>
+</html>
